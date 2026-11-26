@@ -1,0 +1,15 @@
+__pycache__/
+*.py[cod]
+.venv/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+dist/
+build/
+*.egg-info/
+
+# Per-run artifacts (generated Java, explanations). The JSONL summaries in
+# results/*.jsonl are committed so headline numbers are reproducible.
+results/artifacts/
+
+.DS_Store
