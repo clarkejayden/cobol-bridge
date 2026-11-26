@@ -12,6 +12,7 @@ class FakeProvider:
         self._replies = list(replies)
         self._model = model
         self.calls: list[list[Message]] = []
+        self.params: list[GenerationParams] = []
 
     @property
     def name(self) -> str:
@@ -23,6 +24,7 @@ class FakeProvider:
 
     def chat(self, messages: list[Message], params: GenerationParams) -> LLMResponse:
         self.calls.append(list(messages))
+        self.params.append(params)
         if not self._replies:
             raise LLMError("FakeProvider ran out of scripted replies")
         text = self._replies.pop(0)

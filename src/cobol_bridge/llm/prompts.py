@@ -89,6 +89,21 @@ def translate(source: str, explanation: str, record: str) -> str:
     )
 
 
+def repair(request: str, previous: str, feedback: str) -> str:
+    """A self-contained repair request: the task, the failing program, and what is wrong.
+
+    The failing code is quoted in the user turn rather than replayed as the
+    model's own answer, which small models tend to repeat verbatim.
+    """
+    return (
+        f"{request}\n\n"
+        "A previous translation of this program failed:\n"
+        f"```java\n{previous.rstrip()}\n```\n\n"
+        f"{feedback}\n"
+        "Change the code to fix the problem; returning the same program again will fail."
+    )
+
+
 def repair_compile(errors: str) -> str:
     return (
         "The Java program does not compile. javac reported:\n"

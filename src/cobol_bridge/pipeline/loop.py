@@ -5,7 +5,7 @@ from __future__ import annotations
 import hashlib
 import time
 from collections.abc import Callable
-from dataclasses import asdict, dataclass, field
+from dataclasses import asdict, dataclass, field, replace
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -33,6 +33,22 @@ class PipelineConfig:
     n_random: int = 20
     params: GenerationParams = field(default_factory=GenerationParams)
     artifacts_dir: Path | None = None
+    # How a failed attempt is sent back to the model:
+    #   "fresh"  - a new conversation: the original request, the failing code quoted in
+    #              the user message, and the feedback; sampled at repair_temperature
+    #              with a different seed per attempt.
+    #   "replay" - the Phase 1 behaviour: the failing answer replayed as the assistant's
+    #              own turn, then the feedback, at the first attempt's settings.
+    repair_strategy: str = "fresh"
+    repair_temperature: float = 0.4
+
+    def attempt_params(self, attempt: int) -> GenerationParams:
+        """Sampling settings for one attempt (repairs differ only under "fresh")."""
+        if attempt == 1 or self.repair_strategy == "replay":
+            return self.params
+        return replace(
+            self.params, temperature=self.repair_temperature, seed=self.params.seed + attempt - 1
+        )
 
 
 @dataclass
@@ -43,6 +59,9 @@ class AttemptRecord:
     tests_passed: int
     tests_total: int
     failure: str  # short description of what went wrong, "" when passed
+    repeated_code: bool  # the code is identical to the previous attempt's
+    temperature: float
+    seed: int
     prompt_tokens: int
     completion_tokens: int
     llm_latency_s: float
@@ -62,6 +81,8 @@ class RunRecord:
     num_ctx: int
     max_attempts: int
     input_seed: int
+    repair_strategy: str = "replay"
+    repair_temperature: float = 0.0
     attempts: int = 0
     passed: bool = False
     passed_first_try: bool = False
@@ -70,6 +91,7 @@ class RunRecord:
     tests_passed: int = 0
     tests_total: int = 0
     cases_dropped: int = 0
+    repeated_repairs: int = 0
     prompt_tokens: int = 0
     completion_tokens: int = 0
     llm_latency_s: float = 0.0
@@ -154,6 +176,10 @@ def translate_program(
         num_ctx=p.num_ctx,
         max_attempts=cfg.max_attempts,
         input_seed=cfg.input_seed,
+        repair_strategy=cfg.repair_strategy,
+        repair_temperature=(
+            cfg.repair_temperature if cfg.repair_strategy == "fresh" else p.temperature
+        ),
         source_sha256=_sha(source.encode()),
     )
     art = _Artifacts(cfg.artifacts_dir / program if cfg.artifacts_dir else None)
@@ -165,8 +191,8 @@ def translate_program(
     rec.cases_dropped = len(baseline.dropped)
     log(f"{program}: {len(baseline.cases)} test cases ({len(baseline.dropped)} dropped)")
 
-    def ask(messages: list[Message]) -> LLMResponse:
-        resp = provider.chat(messages, p)
+    def ask(messages: list[Message], params: GenerationParams = p) -> LLMResponse:
+        resp = provider.chat(messages, params)
         rec.prompt_tokens += resp.prompt_tokens
         rec.completion_tokens += resp.completion_tokens
         rec.llm_latency_s += resp.latency_s
@@ -182,12 +208,16 @@ def translate_program(
         prompts.translate(source, explanation, prompts.describe_record(record_name, fields)),
     )
     messages = [system, request]
+    previous: str | None = None
     for attempt in range(1, cfg.max_attempts + 1):
-        resp = ask(messages)
+        params = cfg.attempt_params(attempt)
+        resp = ask(messages, params)
         java = prompts.extract_java(resp.text)
         art.write(f"attempt-{attempt}.java", java or resp.text)
         vr = verify_java(java, baseline, tc)
-        _record_attempt(rec, attempt, vr, resp)
+        repeated = attempt > 1 and _same_code(java, previous)
+        rec.repeated_repairs += repeated
+        _record_attempt(rec, attempt, vr, resp, params, repeated)
         log(
             f"{program}: attempt {attempt}: {vr.stage} {vr.passed}/{vr.total} "
             f"{_failure_summary(vr)}".rstrip()
@@ -199,14 +229,33 @@ def translate_program(
             break
         feedback = feedback_for(vr)
         art.write(f"attempt-{attempt}.feedback.txt", feedback)
-        messages = [system, request, Message("assistant", resp.text), Message("user", feedback)]
+        previous = java
+        if cfg.repair_strategy == "replay":
+            messages = [system, request, Message("assistant", resp.text), Message("user", feedback)]
+        else:
+            repair = prompts.repair(request.content, java or resp.text, feedback)
+            messages = [system, Message("user", repair)]
 
     rec.wall_s = round(time.monotonic() - start, 2)
     rec.llm_latency_s = round(rec.llm_latency_s, 2)
     return rec
 
 
-def _record_attempt(rec: RunRecord, attempt: int, vr: VerifyResult, resp: LLMResponse) -> None:
+def _same_code(a: str | None, b: str | None) -> bool:
+    """True if two answers contain the same program, ignoring whitespace."""
+    if a is None or b is None:
+        return False
+    return "".join(a.split()) == "".join(b.split())
+
+
+def _record_attempt(
+    rec: RunRecord,
+    attempt: int,
+    vr: VerifyResult,
+    resp: LLMResponse,
+    params: GenerationParams,
+    repeated: bool,
+) -> None:
     rec.attempts = attempt
     rec.final_stage = str(vr.stage)
     rec.compile_ok = vr.compile_ok
@@ -220,6 +269,9 @@ def _record_attempt(rec: RunRecord, attempt: int, vr: VerifyResult, resp: LLMRes
             tests_passed=vr.passed,
             tests_total=vr.total,
             failure=_failure_summary(vr),
+            repeated_code=repeated,
+            temperature=params.temperature,
+            seed=params.seed,
             prompt_tokens=resp.prompt_tokens,
             completion_tokens=resp.completion_tokens,
             llm_latency_s=round(resp.latency_s, 2),

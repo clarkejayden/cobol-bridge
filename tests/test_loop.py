@@ -26,10 +26,14 @@ def java(name: str) -> str:
 
 
 def run(
-    replies: list[str], toolchain: Toolchain, tmp_path: Path, attempts: int = 3
+    replies: list[str],
+    toolchain: Toolchain,
+    tmp_path: Path,
+    attempts: int = 3,
+    strategy: str = "fresh",
 ) -> tuple[RunRecord, FakeProvider]:
     provider = FakeProvider(["It computes sales tax.", *replies])
-    cfg = PipelineConfig(max_attempts=attempts, artifacts_dir=tmp_path)
+    cfg = PipelineConfig(max_attempts=attempts, artifacts_dir=tmp_path, repair_strategy=strategy)
     rec = translate_program(PROGRAM, provider, toolchain, cfg, run_id="test")
     return rec, provider
 
@@ -59,8 +63,33 @@ def test_repairs_compile_error_then_wrong_output(toolchain: Toolchain, tmp_path:
     mismatch_feedback = provider.calls[3][-1].content
     assert "differs from COBOL" in mismatch_feedback
     assert "-TAX" in mismatch_feedback and "+TAX" in mismatch_feedback
-    # the repair conversation carries only the latest answer, not the whole history
-    assert len(provider.calls[3]) == 4
+    # a fresh repair conversation: system + one user turn quoting the failing code
+    assert [m.role for m in provider.calls[3]] == ["system", "user"]
+    assert "RoundingMode.DOWN" in mismatch_feedback  # the wrong-output code is quoted
+    assert "Translate this COBOL program" in mismatch_feedback
+    assert rec.repeated_repairs == 0
+
+
+def test_repairs_sample_differently(toolchain: Toolchain, tmp_path: Path) -> None:
+    rec, provider = run(
+        [java("compile_error"), java("compile_error"), java("correct")], toolchain, tmp_path
+    )
+    temps = [p.temperature for p in provider.params]
+    seeds = [p.seed for p in provider.params]
+    assert temps == [0.0, 0.0, 0.4, 0.4]  # explain, attempt 1, repairs
+    assert seeds == [42, 42, 43, 44]
+    assert [a.repeated_code for a in rec.attempt_log] == [False, True, False]
+    assert rec.repeated_repairs == 1
+    assert rec.repair_strategy == "fresh"
+
+
+def test_replay_strategy_reproduces_phase1(toolchain: Toolchain, tmp_path: Path) -> None:
+    rec, provider = run(
+        [java("wrong_output"), java("correct")], toolchain, tmp_path, strategy="replay"
+    )
+    assert rec.passed
+    assert [m.role for m in provider.calls[2]] == ["system", "user", "assistant", "user"]
+    assert {p.temperature for p in provider.params} == {0.0}
 
 
 def test_gives_up_after_max_attempts(toolchain: Toolchain, tmp_path: Path) -> None:

@@ -34,6 +34,14 @@ CtxOpt = Annotated[int, typer.Option(help="Model context window (tokens).")]
 InputSeedOpt = Annotated[int, typer.Option(help="Seed for random test inputs.")]
 RandomOpt = Annotated[int, typer.Option(help="Random test cases per program.")]
 ResultsOpt = Annotated[Path, typer.Option(help="JSONL file results are appended to.")]
+RepairOpt = Annotated[
+    str,
+    typer.Option(
+        help="fresh: new prompt quoting the failing code, sampled at --repair-temperature; "
+        "replay: replay the answer as the model's own turn (Phase 1 behaviour)."
+    ),
+]
+RepairTempOpt = Annotated[float, typer.Option(help="Temperature for repair attempts (fresh).")]
 
 
 def _echo(msg: str) -> None:
@@ -82,8 +90,15 @@ def _config(
     input_seed: int,
     n_random: int,
     artifacts: Path,
+    repair_strategy: str,
+    repair_temperature: float,
 ) -> PipelineConfig:
+    if repair_strategy not in ("fresh", "replay"):
+        _echo("error: --repair-strategy must be 'fresh' or 'replay'")
+        raise typer.Exit(2)
     return PipelineConfig(
+        repair_strategy=repair_strategy,
+        repair_temperature=repair_temperature,
         max_attempts=attempts,
         input_seed=input_seed,
         n_random=n_random,
@@ -109,13 +124,25 @@ def translate(
     num_ctx: CtxOpt = 8192,
     input_seed: InputSeedOpt = 42,
     n_random: RandomOpt = 20,
+    repair_strategy: RepairOpt = "fresh",
+    repair_temperature: RepairTempOpt = 0.4,
     results: ResultsOpt = DEFAULT_RESULTS,
 ) -> None:
     """Explain, translate, verify and repair one COBOL program."""
     provider, tc, versions = _setup(model)
     run_id = _run_id(model)
     artifacts = results.parent / "artifacts" / run_id
-    cfg = _config(max_attempts, seed, temperature, num_ctx, input_seed, n_random, artifacts)
+    cfg = _config(
+        max_attempts,
+        seed,
+        temperature,
+        num_ctx,
+        input_seed,
+        n_random,
+        artifacts,
+        repair_strategy,
+        repair_temperature,
+    )
     rec = translate_program(program, provider, tc, cfg, run_id=run_id, log=_echo)
     _save(rec, results, versions, _git_commit())
     status = "PASS" if rec.passed else "FAIL"
@@ -137,6 +164,8 @@ def evaluate(
     num_ctx: CtxOpt = 8192,
     input_seed: InputSeedOpt = 42,
     n_random: RandomOpt = 20,
+    repair_strategy: RepairOpt = "fresh",
+    repair_temperature: RepairTempOpt = 0.4,
     results: ResultsOpt = DEFAULT_RESULTS,
 ) -> None:
     """Run the full loop on every .cbl program in a directory."""
@@ -155,6 +184,8 @@ def evaluate(
         input_seed,
         n_random,
         results.parent / "artifacts" / run_id,
+        repair_strategy,
+        repair_temperature,
     )
     _echo(f"run {run_id}: {len(programs)} programs, model {model}")
     records: list[dict[str, Any]] = []
