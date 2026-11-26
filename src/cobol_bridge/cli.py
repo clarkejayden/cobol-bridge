@@ -4,7 +4,6 @@ from __future__ import annotations
 
 import re
 import subprocess
-from collections import defaultdict
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Any
@@ -14,6 +13,7 @@ import typer
 from cobol_bridge.llm.base import GenerationParams, LLMError
 from cobol_bridge.llm.ollama import OllamaProvider
 from cobol_bridge.pipeline.loop import PipelineConfig, RunRecord, translate_program
+from cobol_bridge.report.render import render_html, render_markdown, select_runs
 from cobol_bridge.report.store import append_record, read_records
 from cobol_bridge.sandbox.toolchain import ToolchainError, find_toolchain, tool_versions
 
@@ -204,29 +204,29 @@ def evaluate(
 @app.command()
 def report(
     results: ResultsOpt = DEFAULT_RESULTS,
-    run_id: Annotated[str | None, typer.Option(help="Only this run.")] = None,
+    run_id: Annotated[
+        list[str] | None, typer.Option(help="Report these runs (repeatable) instead of latest.")
+    ] = None,
+    out_dir: Annotated[
+        Path | None, typer.Option(help="Where report.md and report.html go (default: results/).")
+    ] = None,
 ) -> None:
-    """Summarise recorded runs (latest run per model unless --run-id is given)."""
+    """Write Markdown and HTML comparison tables (latest run per model and repair strategy)."""
     records = list(read_records(results))
     if not records:
         _echo(f"no results in {results}")
         raise typer.Exit(1)
-    by_run: dict[str, list[dict[str, Any]]] = defaultdict(list)
-    for r in records:
-        by_run[r["run_id"]].append(r)
-    if run_id:
-        selected = {run_id: by_run.get(run_id, [])}
-    else:
-        latest: dict[str, str] = {}
-        for rid, recs in by_run.items():
-            model = recs[0]["model"]
-            if rid > latest.get(model, ""):
-                latest[model] = rid
-        selected = {rid: by_run[rid] for rid in sorted(latest.values())}
-    for rid, recs in selected.items():
-        typer.echo(f"run {rid}")
-        typer.echo(summary_table(recs))
-        typer.echo("")
+    runs = select_runs(records, run_id, artifacts=results.parent / "artifacts")
+    if not runs:
+        _echo("no matching runs")
+        raise typer.Exit(1)
+    target = out_dir or results.parent
+    target.mkdir(parents=True, exist_ok=True)
+    markdown = render_markdown(runs)
+    (target / "report.md").write_text(markdown, encoding="utf-8")
+    (target / "report.html").write_text(render_html(runs), encoding="utf-8")
+    typer.echo(markdown)
+    _echo(f"wrote {target / 'report.md'} and {target / 'report.html'}")
 
 
 def summary_table(records: list[dict[str, Any]]) -> str:
