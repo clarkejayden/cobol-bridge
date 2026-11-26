@@ -1,0 +1,5 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="720" height="120" viewBox="0 0 720 120">
+  <rect width="720" height="120" rx="8" fill="#1e1e1e"/>
+  <text x="24" y="50" fill="#9cdcfe" font-family="Menlo, monospace" font-size="16">$ make demo</text>
+  <text x="24" y="88" fill="#808080" font-family="Menlo, monospace" font-size="14">Placeholder: a recording of `make demo` goes here.</text>
+</svg>
