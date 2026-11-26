@@ -1,0 +1,15 @@
+The Java program does not compile. javac reported:
+```
+Main.java:122: error: int cannot be dereferenced
+            BigDecimal itemValue = qty.multiply(cost);
+                                      ^
+Main.java:124: error: incompatible types: int cannot be converted to BigDecimal
+            wsTotal = wsTotal.add(qty);
+                                  ^
+Main.java:125: error: incompatible types: int cannot be converted to BigDecimal
+            wsTotalQty = wsTotalQty.add(qty);
+                                        ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+3 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

@@ -1,0 +1,13 @@
+The Java program failed at run time for this input record:
+```
+        +000000000+0000000+0000000+0000000+0000000+0000000
+```
+```
+exit code 1
+Exception in thread "main" java.lang.NumberFormatException: Character array is missing "e" notation exponential mark.
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:663)
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:497)
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:903)
+	at Main.main(Main.java:30)
+```
+Fix it and return the complete corrected program in one ```java block.

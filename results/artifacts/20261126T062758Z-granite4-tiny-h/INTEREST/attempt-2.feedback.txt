@@ -1,0 +1,20 @@
+The Java program does not compile. javac reported:
+```
+Main.java:26: error: no suitable method found for divide(BigDecimal,BigDecimal,RoundingMode)
+        BigDecimal simpleInterest = BigDecimal.valueOf(IN_PRINCIPAL).multiply(BigDecimal.valueOf(IN_RATE)).divide(BigDecimal.valueOf(100), BigDecimal.valueOf(IN_YEARS), RoundingMode.HALF_UP);
+                                                                                                          ^
+    method BigDecimal.divide(BigDecimal,int,int) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to int)
+    method BigDecimal.divide(BigDecimal,int,RoundingMode) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to int)
+Main.java:32: error: no suitable method found for divide(BigDecimal,BigDecimal,RoundingMode)
+            BigDecimal interest = balance.multiply(BigDecimal.valueOf(IN_RATE)).divide(BigDecimal.valueOf(100), BigDecimal.valueOf(IN_YEARS), RoundingMode.HALF_UP);
+                                                                               ^
+    method BigDecimal.divide(BigDecimal,int,int) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to int)
+    method BigDecimal.divide(BigDecimal,int,RoundingMode) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to int)
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

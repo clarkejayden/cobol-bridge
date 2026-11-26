@@ -1,0 +1,9 @@
+The Java program does not compile. javac reported:
+```
+Main.java:38: error: incompatible types: String is not a functional interface
+        String styledWsFull = wsFull.replaceAll("(?i)[AEIOU]", match -> {
+                                    ^
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+1 error
+```
+Fix every error and return the complete corrected program in one ```java block.

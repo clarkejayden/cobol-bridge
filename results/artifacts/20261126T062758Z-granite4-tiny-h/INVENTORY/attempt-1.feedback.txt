@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:8: error: cannot find symbol
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                                                       ^
+  symbol:   class InputStreamReader
+  location: class Main
+Main.java:45: error: char cannot be dereferenced
+            BigDecimal value = inQty[i - 1].equals("    ") ? BigDecimal.ZERO :
+                                           ^
+Main.java:47: error: char cannot be dereferenced
+            BigDecimal cost = inCost[i - 1].equals("      ") ? BigDecimal.ZERO :
+                                           ^
+Main.java:51: error: char cannot be dereferenced
+            totalQty = totalQty.add(inQty[i - 1].equals("    ") ? BigDecimal.ZERO :
+                                                ^
+Main.java:57: error: char cannot be dereferenced
+            if (inQty[i - 1].equals("    ") || inQty[i - 1].equals("    ")) {
+                            ^
+Main.java:57: error: char cannot be dereferenced
+            if (inQty[i - 1].equals("    ") || inQty[i - 1].equals("    ")) {
+                                                           ^
+Main.java:60: error: char cannot be dereferenced
+            if (!inQty[i - 1].equals("    ") && inQty[i - 1].equals("    ")) {
+                             ^
+Main.java:60: error: char cannot be dereferenced
+            if (!inQty[i - 1].equals("    ") && inQty[i - 1].equals("    ")) {
+                                                            ^
+Main.java:75: error: no suitable constructor found for String(char)
+                    new String(inSKU[i - 1]),
+                    ^
+    constructor String.String(String) is not applicable
+      (argument mismatch; char cannot be converted to String)
+    constructor String.String(char[]) is not applicable
+      (argument mismatch; char cannot be converted to char[])
+    constructor String.String(byte[]) is not applicable
+      (argument mismatch; char cannot be converted to byte[])
+    constructor String.String(StringBuffer) is not applicable
+      (argument mismatch; char cannot be converted to StringBuffer)
+    constructor String.String(StringBuilder) is not applicable
+      (argument mismatch; char cannot be converted to StringBuilder)
+Main.java:76: error: char cannot be dereferenced
+... (56 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.

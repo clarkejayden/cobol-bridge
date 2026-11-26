@@ -1,0 +1,8 @@
+The Java program does not compile. javac reported:
+```
+Main.java:29: error: bad operand type int for unary operator '!'
+        if (!inScore >= 0 && inScore <= 100 || inAttend > 100) {
+            ^
+1 error
+```
+Fix every error and return the complete corrected program in one ```java block.

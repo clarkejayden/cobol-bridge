@@ -1,0 +1,30 @@
+The Java program does not compile. javac reported:
+```
+Main.java:37: error: cannot find symbol
+        wsSimple = inPrincipal.multiply(inRate).divide(java.math.BigDecimal.valueOf(100), 11, java.math.BigDecimal.RoundingMode.HALF_UP)
+                                                                                                                  ^
+  symbol:   variable RoundingMode
+  location: class BigDecimal
+Main.java:41: error: cannot find symbol
+        System.out.println("PRINCIPAL " + wsSimple.setScale(2, java.math.BigDecimal.RoundingMode.HALF_UP));
+                                                                                   ^
+  symbol:   variable RoundingMode
+  location: class BigDecimal
+Main.java:48: error: cannot find symbol
+            wsInterest = wsBalance.multiply(inRate).divide(java.math.BigDecimal.valueOf(100), 11, java.math.BigDecimal.RoundingMode.HALF_UP);
+                                                                                                                      ^
+  symbol:   variable RoundingMode
+  location: class BigDecimal
+Main.java:59: error: cannot find symbol
+            System.out.println("YEAR " + wsYear + "   " + wsBalance.setScale(2, java.math.BigDecimal.RoundingMode.HALF_UP));
+                                                                                                    ^
+  symbol:   variable RoundingMode
+  location: class BigDecimal
+Main.java:63: error: cannot find symbol
+        System.out.println("COMPOUND  " + wsBalance.setScale(2, java.math.BigDecimal.RoundingMode.HALF_UP));
+                                                                                    ^
+  symbol:   variable RoundingMode
+  location: class BigDecimal
+5 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

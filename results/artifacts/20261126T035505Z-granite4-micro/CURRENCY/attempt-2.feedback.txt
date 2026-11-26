@@ -1,0 +1,15 @@
+The Java program does not compile. javac reported:
+```
+Main.java:29: error: cannot find symbol
+        if (!validCurrencies.contains(inFrom) || !validCurrencies.contains(inTo)) {
+                            ^
+  symbol:   method contains(String)
+  location: variable validCurrencies of type String[]
+Main.java:29: error: cannot find symbol
+        if (!validCurrencies.contains(inFrom) || !validCurrencies.contains(inTo)) {
+                                                                 ^
+  symbol:   method contains(String)
+  location: variable validCurrencies of type String[]
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

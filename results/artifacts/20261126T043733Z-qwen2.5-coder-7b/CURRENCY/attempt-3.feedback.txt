@@ -1,0 +1,25 @@
+The Java program does not compile. javac reported:
+```
+Main.java:93: error: cannot find symbol
+                wsRate = new BigDecimal("1.0000");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:96: error: cannot find symbol
+                wsRate = new BigDecimal("0.9150");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:99: error: cannot find symbol
+                wsRate = new BigDecimal("0.7820");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:102: error: cannot find symbol
+                wsRate = new BigDecimal("151.2400");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+4 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

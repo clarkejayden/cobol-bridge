@@ -1,0 +1,31 @@
+The Java program compiled but its output differs from COBOL on 24 of 24 test inputs. For this input record:
+```
+        +000000000+0000000+0000000+0000000+0000000+0000000
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1,11 +1,11 @@
+ ACCOUNT
+-OPENING +0000000.00
+-TXN 1 +     0.00 BAL            0.00
+-TXN 2 +     0.00 BAL            0.00
+-TXN 3 +     0.00 BAL            0.00
+-TXN 4 +     0.00 BAL            0.00
+-TXN 5 +     0.00 BAL            0.00
+-CREDITS           0.00
+-DEBITS            0.00
+-CLOSING           0.00
++OPENING 0.00
++TXN 1 0.00 BAL 0.00
++TXN 2 0.00 BAL 0.00
++TXN 3 0.00 BAL 0.00
++TXN 4 0.00 BAL 0.00
++TXN 5 0.00 BAL 0.00
++CREDITS 0.00
++DEBITS  0
++CLOSING 0.00
+ STATUS  ZERO
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

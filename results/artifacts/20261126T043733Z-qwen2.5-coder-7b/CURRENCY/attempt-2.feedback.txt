@@ -1,0 +1,34 @@
+The Java program does not compile. javac reported:
+```
+Main.java:79: error: incompatible types: BigDecimal[] cannot be converted to BigDecimal
+            wsWhole = wsWhole.divideAndRemainder(noteValues[wsI]);
+                                                ^
+Main.java:80: error: array required, but BigDecimal found
+            wsCount = wsWhole[0];
+                             ^
+Main.java:81: error: array required, but BigDecimal found
+            wsRem = wsWhole[1];
+                           ^
+Main.java:95: error: cannot find symbol
+                wsRate = new BigDecimal("1.0000");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:98: error: cannot find symbol
+                wsRate = new BigDecimal("0.9150");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:101: error: cannot find symbol
+                wsRate = new BigDecimal("0.7820");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:104: error: cannot find symbol
+                wsRate = new BigDecimal("151.2400");
+                ^
+  symbol:   variable wsRate
+  location: class Main
+7 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

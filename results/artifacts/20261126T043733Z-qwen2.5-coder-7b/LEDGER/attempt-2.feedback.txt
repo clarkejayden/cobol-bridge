@@ -1,0 +1,12 @@
+The Java program failed at run time for this input record:
+```
+        +000000000+0000000+0000000+0000000+0000000+0000000
+```
+```
+exit code 1
+Exception in thread "main" java.lang.IllegalArgumentException: Malformed pattern "+ZZ,ZZ9.99"
+	at java.base/java.text.DecimalFormat.applyPattern(DecimalFormat.java:3620)
+	at java.base/java.text.DecimalFormat.<init>(DecimalFormat.java:469)
+	at Main.main(Main.java:30)
+```
+Fix it and return the complete corrected program in one ```java block.

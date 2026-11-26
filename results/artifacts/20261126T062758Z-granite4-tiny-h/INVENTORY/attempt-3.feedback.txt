@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:46: error: char cannot be dereferenced
+            BigDecimal value = inQty[i - 1].equals("    ") ? BigDecimal.ZERO :
+                                           ^
+Main.java:48: error: char cannot be dereferenced
+            BigDecimal cost = inCost[i - 1].equals("      ") ? BigDecimal.ZERO :
+                                           ^
+Main.java:52: error: char cannot be dereferenced
+            totalQty = totalQty.add(inQty[i - 1].equals("    ") ? BigDecimal.ZERO :
+                                                ^
+Main.java:58: error: char cannot be dereferenced
+            if (inQty[i - 1].equals("    ") || inQty[i - 1].equals("    ")) {
+                            ^
+Main.java:58: error: char cannot be dereferenced
+            if (inQty[i - 1].equals("    ") || inQty[i - 1].equals("    ")) {
+                                                           ^
+Main.java:61: error: char cannot be dereferenced
+            if (!inQty[i - 1].equals("    ") && !inQty[i - 1].equals("    ")) {
+                             ^
+Main.java:61: error: char cannot be dereferenced
+            if (!inQty[i - 1].equals("    ") && !inQty[i - 1].equals("    ")) {
+                                                             ^
+Main.java:76: error: no suitable constructor found for String(char)
+                    new String(inSKU[i - 1]),
+                    ^
+    constructor String.String(String) is not applicable
+      (argument mismatch; char cannot be converted to String)
+    constructor String.String(char[]) is not applicable
+      (argument mismatch; char cannot be converted to char[])
+    constructor String.String(byte[]) is not applicable
+      (argument mismatch; char cannot be converted to byte[])
+    constructor String.String(StringBuffer) is not applicable
+      (argument mismatch; char cannot be converted to StringBuffer)
+    constructor String.String(StringBuilder) is not applicable
+      (argument mismatch; char cannot be converted to StringBuilder)
+Main.java:77: error: char cannot be dereferenced
+                    inQty[i - 1].equals("    ") ? "    " : inQty[i - 1].substring(0, 4),
+                                ^
+Main.java:77: error: char cannot be dereferenced
+                    inQty[i - 1].equals("    ") ? "    " : inQty[i - 1].substring(0, 4),
+                                                                       ^
+... (51 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.

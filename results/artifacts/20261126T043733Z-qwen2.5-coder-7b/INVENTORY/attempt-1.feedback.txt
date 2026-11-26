@@ -1,0 +1,33 @@
+The Java program compiled but its output differs from COBOL on 24 of 24 test inputs. For this input record:
+```
+        0000000000     0000000000     0000000000     0000000000     0000000000     0000000000
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1,13 +1,13 @@
+ WAREHOUSE
+ SKU        QTY      COST          VALUE
+-           0      0.00           0.00 REORDER
+-           0      0.00           0.00 REORDER
+-           0      0.00           0.00 REORDER
+-           0      0.00           0.00 REORDER
+-           0      0.00           0.00 REORDER
+-           0      0.00           0.00 REORDER
+-TOTAL VALUE              0.00
+-TOTAL UNITS          0
+-AVG UNIT COST      0.00
++           0       0.00       0.00
++           0       0.00       0.00
++           0       0.00       0.00
++           0       0.00       0.00
++           0       0.00       0.00
++           0       0.00       0.00
++TOTAL VALUE          0.00
++TOTAL UNITS         0
++AVG UNIT COST           0
+ TOP LINE
+ TO REORDER     6
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

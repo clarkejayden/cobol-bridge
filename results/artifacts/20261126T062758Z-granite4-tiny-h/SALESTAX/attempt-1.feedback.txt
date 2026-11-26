@@ -1,0 +1,20 @@
+The Java program does not compile. javac reported:
+```
+Main.java:31: error: cannot find symbol
+                        tax = inAmount.movePointLeft(2).multiply(rate).divide(BigDecimal.valueOf(100), RoundingMode.HALF_UP);
+                                      ^
+  symbol:   method movePointLeft(int)
+  location: variable inAmount of type char[]
+Main.java:33: error: cannot find symbol
+                    total = inAmount.movePointLeft(2).add(tax);
+                                    ^
+  symbol:   method movePointLeft(int)
+  location: variable inAmount of type char[]
+Main.java:41: error: cannot find symbol
+        System.out.println("STATE    " + new String(inState) + "  RATE " + rate.movePointRight(2).stripTrailingZeros().toPlainString() + "%");
+                                                                           ^
+  symbol:   variable rate
+  location: class Main
+3 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

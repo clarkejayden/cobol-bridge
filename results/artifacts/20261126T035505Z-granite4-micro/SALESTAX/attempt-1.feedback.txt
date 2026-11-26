@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:13: error: cannot find symbol
+        BigDecimal inAmount = new BigDecimal(line.substring(2, 10));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:13: error: cannot find symbol
+        BigDecimal inAmount = new BigDecimal(line.substring(2, 10));
+                                  ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:35: error: cannot find symbol
+        boolean knownState = rateTable.stream()
+                                      ^
+  symbol:   method stream()
+  location: variable rateTable of type String[][]
+Main.java:44: error: cannot find symbol
+        BigDecimal tax = BigDecimal.ZERO;
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:44: error: cannot find symbol
+        BigDecimal tax = BigDecimal.ZERO;
+                         ^
+  symbol:   variable BigDecimal
+  location: class Main
+Main.java:47: error: cannot find symbol
+                tax = new BigDecimal(row[1]).multiply(inAmount).divide(BigDecimal.valueOf(100), 20, RoundingMode.HALF_UP);
+                                                                                                    ^
+  symbol:   variable RoundingMode
+  location: class Main
+Main.java:47: error: cannot find symbol
+                tax = new BigDecimal(row[1]).multiply(inAmount).divide(BigDecimal.valueOf(100), 20, RoundingMode.HALF_UP);
+                          ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:47: error: cannot find symbol
+                tax = new BigDecimal(row[1]).multiply(inAmount).divide(BigDecimal.valueOf(100), 20, RoundingMode.HALF_UP);
+                                                                       ^
+  symbol:   variable BigDecimal
+  location: class Main
+... (26 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.
