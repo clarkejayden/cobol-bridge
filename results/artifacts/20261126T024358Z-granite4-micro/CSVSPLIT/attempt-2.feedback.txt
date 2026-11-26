@@ -1,0 +1,16 @@
+The Java program failed at run time for this input record:
+```
+                                        
+```
+```
+exit code 1
+Exception in thread "main" java.lang.NumberFormatException
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:703)
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:497)
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:903)
+	at Main.main(Main.java:44)
+Caused by: java.lang.ArrayIndexOutOfBoundsException: Index 0 out of bounds for length 0
+	at java.base/java.math.BigDecimal.<init>(BigDecimal.java:545)
+	... 3 more
+```
+Fix it and return the complete corrected program in one ```java block.

@@ -1,0 +1,8 @@
+The Java program uses floating point, which cannot represent COBOL decimals exactly:
+- line 49: floating-point literal: .add(wsOtHours.multiply(rate).multiply(BigDecimal.valueOf(1.5))).setScale(2, RoundingMode.HALF_UP);
+- line 55: floating-point literal: wsTax = wsGross.multiply(BigDecimal.valueOf(0.10)).setScale(2, RoundingMode.HALF_UP);
+- line 58: floating-point literal: .add(gross.subtract(BigDecimal.valueOf(500)).multiply(BigDecimal.valueOf(0.20))).setScale(2, RoundingMode.HALF_UP);
+- line 61: floating-point literal: .add(gross.subtract(BigDecimal.valueOf(1500)).multiply(BigDecimal.valueOf(0.30))).setScale(2, RoundingMode.HALF_UP);
+- line 66: floating-point literal: wsBenefits = BigDecimal.valueOf(45.50).setScale(2, RoundingMode.HALF_UP);
+- line 68: floating-point literal: wsBenefits = BigDecimal.valueOf(12.25).setScale(2, RoundingMode.HALF_UP);
+Use java.math.BigDecimal with explicit scale and RoundingMode instead, and return the complete corrected program in one ```java block.

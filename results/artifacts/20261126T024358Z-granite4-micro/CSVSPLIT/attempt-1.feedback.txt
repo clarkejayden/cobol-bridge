@@ -1,0 +1,15 @@
+The Java program does not compile. javac reported:
+```
+Main.java:7: error: bad operand types for binary operator '*'
+        if (line == null) line = " " * 40;
+                                     ^
+  first type:  String
+  second type: int
+Main.java:8: error: bad operand types for binary operator '*'
+        else if (line.length() < 40) line = line + " " * (40 - line.length());
+                                                       ^
+  first type:  String
+  second type: int
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

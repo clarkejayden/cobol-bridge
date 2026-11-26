@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:25: error: cannot find symbol
+        BigDecimal inPrincipal = new BigDecimal(principalStr);
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:25: error: cannot find symbol
+        BigDecimal inPrincipal = new BigDecimal(principalStr);
+                                     ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:26: error: cannot find symbol
+        BigDecimal inRate = new BigDecimal(rateStr);
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:26: error: cannot find symbol
+        BigDecimal inRate = new BigDecimal(rateStr);
+                                ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:30: error: cannot find symbol
+        BigDecimal wsSimple = BigDecimal.ZERO;
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:30: error: cannot find symbol
+        BigDecimal wsSimple = BigDecimal.ZERO;
+                              ^
+  symbol:   variable BigDecimal
+  location: class Main
+Main.java:31: error: cannot find symbol
+        BigDecimal wsBalance = inPrincipal;
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:32: error: cannot find symbol
+        BigDecimal wsInterest = BigDecimal.ZERO;
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+... (46 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.

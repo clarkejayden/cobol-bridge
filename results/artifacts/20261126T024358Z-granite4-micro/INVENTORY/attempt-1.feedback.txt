@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:53: error: cannot find symbol
+        BigDecimal cost1 = new BigDecimal(line.substring(cost1Offset, cost1Offset + cost1Length));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:53: error: cannot find symbol
+        BigDecimal cost1 = new BigDecimal(line.substring(cost1Offset, cost1Offset + cost1Length));
+                               ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:56: error: cannot find symbol
+        BigDecimal cost2 = new BigDecimal(line.substring(cost2Offset, cost2Offset + cost2Length));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:56: error: cannot find symbol
+        BigDecimal cost2 = new BigDecimal(line.substring(cost2Offset, cost2Offset + cost2Length));
+                               ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:59: error: cannot find symbol
+        BigDecimal cost3 = new BigDecimal(line.substring(cost3Offset, cost3Offset + cost3Length));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:59: error: cannot find symbol
+        BigDecimal cost3 = new BigDecimal(line.substring(cost3Offset, cost3Offset + cost3Length));
+                               ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:62: error: cannot find symbol
+        BigDecimal cost4 = new BigDecimal(line.substring(cost4Offset, cost4Offset + cost4Length));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:62: error: cannot find symbol
+        BigDecimal cost4 = new BigDecimal(line.substring(cost4Offset, cost4Offset + cost4Length));
+                               ^
+  symbol:   class BigDecimal
+  location: class Main
+... (99 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.

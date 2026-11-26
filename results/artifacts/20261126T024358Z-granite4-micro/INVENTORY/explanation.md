@@ -1,0 +1,5 @@
+The COBOL program processes inventory data for six items and generates a report. It reads an input record containing warehouse location, SKU, quantity, and cost for each item. Working fields store values for total value, total quantity, maximum value, and reorder flag.
+
+The program iterates over each item, calculating its value (quantity × cost), adding it to the total value and total quantity, and updating the maximum value and its index. If an item's value exceeds the current maximum, it updates the maximum value and index. If an item's quantity is below 100, it sets the reorder flag and increments the reorder count.
+
+After processing all items, the program calculates the average unit cost (total value ÷ total quantity) and displays the total value, total units, average unit cost, the item with the maximum value, and the reorder flag.

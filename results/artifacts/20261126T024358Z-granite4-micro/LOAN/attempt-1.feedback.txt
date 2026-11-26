@@ -1,0 +1,45 @@
+The Java program does not compile. javac reported:
+```
+Main.java:15: error: cannot find symbol
+        BigDecimal inAmount = new BigDecimal(line.substring(offsetAmount, offsetAmount + widthAmount));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:15: error: cannot find symbol
+        BigDecimal inAmount = new BigDecimal(line.substring(offsetAmount, offsetAmount + widthAmount));
+                                  ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:16: error: cannot find symbol
+        BigDecimal inRate = new BigDecimal(line.substring(offsetRate, offsetRate + widthRate));
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:16: error: cannot find symbol
+        BigDecimal inRate = new BigDecimal(line.substring(offsetRate, offsetRate + widthRate));
+                                ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:26: error: cannot find symbol
+        BigDecimal wsBalance = BigDecimal.ZERO;
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:26: error: cannot find symbol
+        BigDecimal wsBalance = BigDecimal.ZERO;
+                               ^
+  symbol:   variable BigDecimal
+  location: class Main
+Main.java:27: error: cannot find symbol
+        BigDecimal wsPrincipal = inAmount.divide(BigDecimal.valueOf(inMonths), 20, RoundingMode.HALF_UP);
+        ^
+  symbol:   class BigDecimal
+  location: class Main
+Main.java:27: error: cannot find symbol
+        BigDecimal wsPrincipal = inAmount.divide(BigDecimal.valueOf(inMonths), 20, RoundingMode.HALF_UP);
+                                                                                   ^
+  symbol:   variable RoundingMode
+  location: class Main
+... (56 more lines)
+```
+Fix every error and return the complete corrected program in one ```java block.
