@@ -1,7 +1,7 @@
 MODEL ?= granite4:micro
 ATTEMPTS ?= 3
 
-.PHONY: help doctor install test lint typecheck check demo eval
+.PHONY: help doctor install test lint typecheck check demo eval report
 
 help:
 	@echo "make doctor     check toolchain, Ollama and model"
@@ -9,6 +9,7 @@ help:
 	@echo "make check      lint + typecheck + tests"
 	@echo "make demo       translate and verify one corpus program"
 	@echo "make eval       evaluate the whole corpus (MODEL=$(MODEL))"
+	@echo "make report     write results/report.md and results/report.html"
 
 doctor:
 	@scripts/doctor.sh $(MODEL)
@@ -33,3 +34,6 @@ demo:
 
 eval:
 	uv run cobol-bridge eval corpus --model $(MODEL) --max-attempts $(ATTEMPTS)
+
+report:
+	uv run cobol-bridge report > /dev/null

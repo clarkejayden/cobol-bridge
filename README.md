@@ -10,35 +10,50 @@ Granite models run locally through Ollama. No API keys and no cloud.
 
 ## Results
 
-Phase 1 baseline: `granite4:micro` (3B), 10 programs, up to 3 attempts each,
-temperature 0, seed 42 (run `20261126T024358Z-granite4-micro`).
+Ten COBOL programs, three local models on an 8 GB Apple M1, up to 3 attempts each
+(first try at temperature 0, seed 42). Full tables: [`results/report.md`](results/report.md)
+(also as [HTML](results/report.html)).
 
-| Metric | granite4:micro |
-|---|---|
-| Programs passing on the first try | **0 / 10** |
-| Programs passing after repair | **0 / 10** |
-| Programs whose final attempt compiled | 3 / 10 |
-| Test cases passed (where the Java compiled) | 0 / 66 |
-| Average attempts | 3.00 |
-| Average LLM time per program | 291 s |
-| Tokens, whole corpus | 113,236 |
+| | `qwen2.5-coder:7b` | `granite4:micro` (3B) | `granite4:tiny-h` (7B MoE) |
+|---|---|---|---|
+| **Programs passing, first try** | **0 / 10** | **0 / 10** | **0 / 10** |
+| **Programs passing after repair** | **0 / 10** | **0 / 10** | **0 / 10** |
+| Final attempt compiles | 9 / 10 | 4 / 10 | 6 / 10 |
+| Test cases matched (where it compiled) | 21 / 238 (9%) | 13 / 103 (13%) | 6 / 153 (4%) |
+| Repairs that returned the same code | 7 / 20 | 11 / 20 | 10 / 20 |
+| Avg LLM time per program | 461 s | 249 s | 141 s |
 
-Where the 30 attempts stopped: 21 at `javac`, 6 at run time (an exception on every
-input), 3 at the floating-point check. **15 of the 20 repair attempts returned
-exactly the same code as the attempt before**, even though the feedback contained the
-compiler error or stack trace. A 3B model at temperature 0 mostly does not use the
-repair feedback. Larger models and a repair strategy that breaks that loop are
-the next step (Phase 2).
+**No local model under 8 GB produced a single fully correct translation.** That is
+the finding, not a bug: every failure is a concrete, logged difference from the
+COBOL output. The models got the logic roughly right more often than the format.
+Typical diffs from the repair prompts:
 
-**Why `granite4:micro` is the default:** it is a 2.1 GB download and leaves room for
-the JDK on an 8 GB M1. `granite4:tiny-h` (7B mixture-of-experts, about 1B parameters
-active) also fits: Ollama ran it 100% on the GPU at 4.4 GB. In a one-program spot check
-(SALESTAX, not part of `results.jsonl`) it was faster than `micro` (160 s vs 186 s of
-LLM time) but failed the same way, repeating code that did not compile. The full
-multi-model comparison is Phase 2.
+```diff
+-SUBTOTAL  36,796.64          # COBOL: PIC 9(6)V99 has an implied decimal point
++SUBTOTAL 3,679,664.00        # Java read the digits as a whole number
+-YEARS     00                 # COBOL: unedited PIC 99 keeps its leading zero
++YEARS     0
+-PRINCIPAL                 0.00   # COBOL: edited fields keep their full width
++PRINCIPAL 0.00
+```
 
-This is the point of the project: a translation that *looks* plausible is not
-accepted until it reproduces the COBOL output byte for byte.
+The qwen code model wrote Java that compiled far more often (9 of 10) but then failed
+on fixed-width output formatting. The Granite models more often failed to compile
+(invented APIs, missing imports) or fell back to `double`, which the static check
+rejects.
+
+**Repair strategy.** Phase 1 replayed the failing answer as the model's own turn,
+and `granite4:micro` returned identical code in 15 of 20 repairs. Phase 2 repairs
+in a fresh prompt that quotes the failing code, at temperature 0.4 with a new seed
+per attempt. For the same model, repeats fell to 11 of 20, compiling programs rose
+from 3 to 4, and matched cases from 0 to 13. The changes were real, but too small to
+turn any program into a pass. Both runs are in the report
+(`--repair-strategy replay` reproduces Phase 1).
+
+**Fitting on 8 GB.** `granite4:micro` (2.1 GB) and `granite4:tiny-h` (4.4 GB) ran 100%
+on the GPU. `qwen2.5-coder:7b` (5.4 GB loaded) ran 85% GPU / 15% CPU, which is why it
+is the slowest. `tiny-h` is the fastest because only about 1B of its 7B parameters are
+active per token.
 
 Every number above comes from [`results/results.jsonl`](results/results.jsonl) (one
 record per program per run) and can be regenerated with `make eval`. The generated
@@ -92,7 +107,7 @@ ollama pull granite4:micro
 make doctor                    # checks every tool and prints versions
 make demo                      # translate + verify one program
 make eval                      # the whole corpus; MODEL=granite4:tiny-h to compare
-uv run cobol-bridge report     # summary of the latest run per model
+make report                    # results/report.md + report.html
 ```
 
 `make test` runs the unit tests without Ollama (a scripted fake model drives the loop).
@@ -171,8 +186,9 @@ scripts/doctor.sh   toolchain check
 
 ## Roadmap
 
-- **Phase 2:** compare several local models (two Granite sizes and one non-IBM model);
-  `report` renders Markdown and static HTML tables.
+- **Next:** larger models where the hardware allows, few-shot examples of COBOL
+  edited-picture formatting in the prompt, and a repair loop that targets the first
+  differing line.
 - **Phase 3:** file-based I/O programs, copybooks, and a write-up of where models fail.
 
 ## License
