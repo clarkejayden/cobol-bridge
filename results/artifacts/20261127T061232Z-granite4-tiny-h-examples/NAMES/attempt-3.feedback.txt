@@ -1,0 +1,40 @@
+The Java program does not compile. javac reported:
+```
+Main.java:47: error: cannot find symbol
+        for (char c : inFirst.toCharArray()) {
+                             ^
+  symbol:   method toCharArray()
+  location: variable inFirst of type char[]
+Main.java:57: error: cannot find symbol
+            wsInitials.append(inLast.charAt(0));
+                                    ^
+  symbol:   method charAt(int)
+  location: variable inLast of type char[]
+Main.java:60: error: cannot find symbol
+            wsInitials.append(inFirst.charAt(0));
+                                     ^
+  symbol:   method charAt(int)
+  location: variable inFirst of type char[]
+Main.java:64: error: cannot find symbol
+            wsInitials.append(inLast.substring(0, 1));
+                                    ^
+  symbol:   method substring(int,int)
+  location: variable inLast of type char[]
+Main.java:67: error: cannot find symbol
+            wsInitials.append(inFirst.substring(0, 1));
+                                     ^
+  symbol:   method substring(int,int)
+  location: variable inFirst of type char[]
+Main.java:75: error: cannot find symbol
+            wsUserId.append(inLast.substring(0, 6));
+                                  ^
+  symbol:   method substring(int,int)
+  location: variable inLast of type char[]
+Main.java:78: error: cannot find symbol
+            wsUserId.append(inFirst.substring(0, 1));
+                                   ^
+  symbol:   method substring(int,int)
+  location: variable inFirst of type char[]
+7 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

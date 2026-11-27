@@ -1,0 +1,32 @@
+The Java program does not compile. javac reported:
+```
+Main.java:1: error: illegal character: '`'
+```java
+^
+Main.java:1: error: illegal character: '`'
+```java
+ ^
+Main.java:1: error: illegal character: '`'
+```java
+  ^
+Main.java:2: error: class, interface, enum, or record expected
+import java.io.BufferedReader;
+^
+Main.java:3: error: class, interface, enum, or record expected
+import java.io.IOException;
+^
+Main.java:4: error: class, interface, enum, or record expected
+import java.io.InputStreamReader;
+^
+Main.java:5: error: class, interface, enum, or record expected
+import java.math.BigDecimal;
+^
+Main.java:6: error: class, interface, enum, or record expected
+import java.math.RoundingMode;
+^
+Main.java:123: error: reached end of file while parsing
+                                                                                                                                                                                                                            if (i < inQty.length && !inQty[i].isEmpty() && inQty[i].charAt(0) != '0' && in
+                                                                                                                                                                                                                                                                                                          ^
+9 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

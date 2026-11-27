@@ -1,0 +1,12 @@
+The Java program does not compile. javac reported:
+```
+Main.java:8: error: cannot find symbol
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                                                       ^
+  symbol:   class InputStreamReader
+  location: class Main
+Note: Main.java uses or overrides a deprecated API.
+Note: Recompile with -Xlint:deprecation for details.
+1 error
+```
+Fix every error and return the complete corrected program in one ```java block.

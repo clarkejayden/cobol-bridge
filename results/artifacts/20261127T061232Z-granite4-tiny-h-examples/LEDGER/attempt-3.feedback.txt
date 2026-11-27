@@ -1,0 +1,22 @@
+The Java program does not compile. javac reported:
+```
+Main.java:22: error: variable inOpening is already defined in method main(String[])
+        BigDecimal inOpening = new BigDecimal(new String(inOpening));
+                   ^
+Main.java:22: error: no suitable constructor found for String(BigDecimal)
+        BigDecimal inOpening = new BigDecimal(new String(inOpening));
+                                              ^
+    constructor String.String(String) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to String)
+    constructor String.String(char[]) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to char[])
+    constructor String.String(byte[]) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to byte[])
+    constructor String.String(StringBuffer) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to StringBuffer)
+    constructor String.String(StringBuilder) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to StringBuilder)
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

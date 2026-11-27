@@ -1,0 +1,24 @@
+The Java program compiled but its output differs from COBOL on 18 of 28 test inputs. For this input record:
+```
+ T-W  F441000776
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1,7 +1,7 @@
+ EMPLOYEE   T-W    STATUS F
+-REG HOURS  40.0
+-OT HOURS  401.0
+-GROSS         4,978.04
+-TAX           1,293.41
+-BENEFITS         45.50
+-NET PAY       3,639.13
++REG HOURS 40.0
++OT HOURS  4370.0
++GROSS     5117720.00
++TAX       1535116.00
++BENEFITS  45.50
++NET PAY  3582558.50
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

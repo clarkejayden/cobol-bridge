@@ -1,0 +1,11 @@
+The Java program does not compile. javac reported:
+```
+Main.java:43: error: ';' expected
+        System.out.println("PRINCIPAL " + new BigDecimal(principal).divide(newBigDecimal(100).pow(2).multiply(new BigDecimal(years)), 2, RoundingMode.HALF_UP)));
+                                                                                                                                                               ^
+Main.java:44: error: ';' expected
+        System.out.println("RATE      " + new BigDecimal(rate).divide(newBigDecimal(100).pow(2), 4, RoundingMode.HALF_UP)));
+                                                                                                                          ^
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

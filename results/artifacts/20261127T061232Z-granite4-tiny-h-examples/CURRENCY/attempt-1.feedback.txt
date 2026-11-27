@@ -1,0 +1,6 @@
+The Java program uses floating point, which cannot represent COBOL decimals exactly:
+- line 21: floating-point literal: rates.put("USD", BigDecimal.valueOf(1.0));
+- line 22: floating-point literal: rates.put("EUR", BigDecimal.valueOf(0.9150));
+- line 23: floating-point literal: rates.put("GBP", BigDecimal.valueOf(0.7820));
+- line 24: floating-point literal: rates.put("JPY", BigDecimal.valueOf(151.2400));
+Use java.math.BigDecimal with explicit scale and RoundingMode instead, and return the complete corrected program in one ```java block.

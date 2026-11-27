@@ -120,3 +120,17 @@ def test_repeated_repairs_recomputed_from_artifacts(tmp_path: Path) -> None:
     assert s.repeated_repairs == 1
     (s,) = select_runs([old])
     assert s.repeated_repairs is None
+
+
+def test_fixed_denominator_counts_cases_of_programs_that_did_not_compile() -> None:
+    ran = {"compile_ok": True, "final_stage": "run", "inputs_sha256": "x"}
+    records = [
+        rec("r1", "m1", "P1", tests_passed=3, tests_total=10, **ran),
+        rec("r1", "m1", "P2", inputs_sha256="y"),  # did not compile: 0/0
+        rec("r2", "m2", "P1", tests_passed=1, tests_total=10, **ran),
+        rec("r2", "m2", "P2", tests_passed=0, tests_total=20, **{**ran, "inputs_sha256": "y"}),
+    ]
+    by_id = {s.run_id: s for s in select_runs(records)}
+    assert (by_id["r1"].cases_total, by_id["r1"].cases_generated) == (10, 30)
+    assert (by_id["r2"].cases_total, by_id["r2"].cases_generated) == (30, 30)
+    assert "3/30 (10%)" in render_markdown(list(by_id.values()))

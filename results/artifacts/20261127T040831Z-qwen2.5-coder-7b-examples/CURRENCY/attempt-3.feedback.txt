@@ -1,0 +1,11 @@
+The Java program failed at run time for this input record:
+```
+000000000      
+```
+```
+exit code 1
+Exception in thread "main" java.lang.IllegalArgumentException: Invalid currency: 
+	at Main.getRate(Main.java:65)
+	at Main.main(Main.java:23)
+```
+Fix it and return the complete corrected program in one ```java block.

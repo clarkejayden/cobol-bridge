@@ -1,0 +1,7 @@
+This COBOL program converts an amount of one currency to another, using USD as an intermediate currency. It takes an input record containing the amount, the source currency, and the target currency. The program checks if the source and target currencies are valid (USD, EUR, GBP, or JPY). If either is invalid, it displays an error message and stops.
+
+The program then looks up the exchange rates for the source and target currencies relative to USD. It calculates the amount in USD by dividing the input amount by the source currency's rate. If converting to JPY, it multiplies the USD amount by the target rate. Otherwise, it multiplies the USD amount by the target rate. The result is rounded to the nearest whole number.
+
+The program then breaks down the whole number result into notes using a predefined note data table. It divides the whole number by each note value, calculates the count and remainder, and displays the note and count if the count is greater than zero. The remainder becomes the new whole number for the next iteration.
+
+Finally, the program displays the converted amount in the target currency, the exchange rate used, and the breakdown of notes and counts. If the amount is too large to convert, it displays an error message and stops.

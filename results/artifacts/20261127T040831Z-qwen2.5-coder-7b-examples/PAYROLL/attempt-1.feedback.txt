@@ -1,0 +1,13 @@
+The Java program compiled but its output differs from COBOL on 25 of 28 test inputs. For this input record:
+```
+       000000000
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1 +1 @@
+-EMPLOYEE        REJECTED: BAD STATUS [ ]
++EMPLOYEE  REJECTED: BAD STATUS [ ]
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

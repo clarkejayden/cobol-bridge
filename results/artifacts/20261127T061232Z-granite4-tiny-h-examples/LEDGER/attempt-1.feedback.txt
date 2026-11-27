@@ -1,0 +1,37 @@
+The Java program does not compile. javac reported:
+```
+Main.java:8: error: cannot find symbol
+        BufferedReader reader = new BufferedReader(new InputStreamReader(System.in));
+                                                       ^
+  symbol:   class InputStreamReader
+  location: class Main
+Main.java:21: error: variable inOpening is already defined in method main(String[])
+        BigDecimal inOpening = new BigDecimal(new String(inOpening));
+                   ^
+Main.java:21: error: no suitable constructor found for String(BigDecimal)
+        BigDecimal inOpening = new BigDecimal(new String(inOpening));
+                                              ^
+    constructor String.String(String) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to String)
+    constructor String.String(char[]) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to char[])
+    constructor String.String(byte[]) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to byte[])
+    constructor String.String(StringBuffer) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to StringBuffer)
+    constructor String.String(StringBuilder) is not applicable
+      (argument mismatch; BigDecimal cannot be converted to StringBuilder)
+Main.java:50: error: cannot find symbol
+        outBal = wsBalance.stripTrailingZeros().toPlainString();
+        ^
+  symbol:   variable outBal
+  location: class Main
+Main.java:51: error: cannot find symbol
+        System.out.println("CLOSING " + outBal);
+                                        ^
+  symbol:   variable outBal
+  location: class Main
+Note: Some messages have been simplified; recompile with -Xdiags:verbose to get full output
+5 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

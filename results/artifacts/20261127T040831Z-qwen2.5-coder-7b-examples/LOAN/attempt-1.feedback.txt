@@ -1,0 +1,13 @@
+The Java program compiled but its output differs from COBOL on 18 of 23 test inputs. For this input record:
+```
+00000000000000000
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1 +1 @@
+-INVALID TERM: 000
++INVALID TERM: 0
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

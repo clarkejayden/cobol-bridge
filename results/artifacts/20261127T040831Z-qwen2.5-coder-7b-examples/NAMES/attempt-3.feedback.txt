@@ -1,0 +1,25 @@
+The Java program compiled but its output differs from COBOL on 24 of 24 test inputs. For this input record:
+```
+                                     
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1,7 +1,7 @@
+-ENTRY    [,  ()                               ]
+-LENGTH   05
+-A COUNT  00
+-LEADING  12
+-INITIALS [ . .]
+-USERID   xxxxxxx0
+-STYLED   [,  ()                               ]
++ENTRY    []
++LENGTH   0
++A COUNT  0
++LEADING  0
++INITIALS []
++USERID   0
++STYLED   []
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

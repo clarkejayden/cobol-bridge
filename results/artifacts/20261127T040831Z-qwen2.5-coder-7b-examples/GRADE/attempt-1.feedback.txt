@@ -1,0 +1,11 @@
+The Java program does not compile. javac reported:
+```
+Main.java:23: error: bad operand type int for unary operator '!'
+        if (!inScore.compareTo(BigDecimal.ZERO) >= 0 || !inScore.compareTo(new BigDecimal("100")) <= 0 || inAttend.compareTo(new BigDecimal("100")) > 0) {
+            ^
+Main.java:23: error: bad operand type int for unary operator '!'
+        if (!inScore.compareTo(BigDecimal.ZERO) >= 0 || !inScore.compareTo(new BigDecimal("100")) <= 0 || inAttend.compareTo(new BigDecimal("100")) > 0) {
+                                                        ^
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

@@ -1,0 +1,5 @@
+This COBOL program manages inventory for six items stored in a warehouse. It accepts an input record containing warehouse information and details for each item, including SKU, quantity, and unit cost. The program calculates the total value, total quantity, average unit cost, and identifies items needing reordering based on quantity thresholds.
+
+The data layout consists of an input record (IN-REC) with warehouse information and six occurrences of item details (IN-ITEM), each containing SKU, quantity, and cost. Working storage variables (WS-*) are used to compute totals, track the most valuable item, and manage the reorder flag. The report line (RPT-LINE) formats the output.
+
+The program iterates through each item, calculating its value and updating totals. It flags items requiring reordering if their quantity falls below 100 units. The output is a formatted report displaying warehouse information, item details, total value, total units, average unit cost, the most valuable item, reorder status, and the total quantity. The program concludes by displaying these details in a structured format.

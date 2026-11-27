@@ -19,7 +19,7 @@ Ten COBOL programs, three local models on an 8 GB Apple M1, up to 3 attempts eac
 | **Programs passing, first try** | **0 / 10** | **0 / 10** | **0 / 10** |
 | **Programs passing after repair** | **0 / 10** | **0 / 10** | **0 / 10** |
 | Final attempt compiles | 9 / 10 | 4 / 10 | 6 / 10 |
-| Test cases matched (where it compiled) | 21 / 238 (9%) | 13 / 103 (13%) | 6 / 153 (4%) |
+| Test cases matched (of all 271 generated) | 21 (8%) | 13 (5%) | 6 (2%) |
 | Repairs that returned the same code | 7 / 20 | 11 / 20 | 10 / 20 |
 | Avg LLM time per program | 461 s | 249 s | 141 s |
 
@@ -49,6 +49,30 @@ per attempt. For the same model, repeats fell to 11 of 20, compiling programs ro
 from 3 to 4, and matched cases from 0 to 13. The changes were real, but too small to
 turn any program into a pass. Both runs are in the report
 (`--repair-strategy replay` reproduces Phase 1).
+
+**Formatting examples.** Since formatting was the main failure, a follow-up run added
+17 worked DISPLAY examples to the prompt (`--prompt-variant examples`): a PIC, a
+value and GnuCOBOL's exact output, for example `PIC 9(2)` value 0 → `[00]` and
+`PIC ZZ,ZZ9.99` value 0 → `[     0.00]`. A test compiles the examples with `cobc`, so
+they are the compiler's real output. Nothing else changed (same models, seeds,
+inputs, repair strategy).
+
+| | `qwen2.5-coder:7b` | | `granite4:tiny-h` | |
+|---|---|---|---|---|
+| | without | **with examples** | without | **with examples** |
+| Programs passing | 0 / 10 | **0 / 10** | 0 / 10 | **0 / 10** |
+| Final attempt compiles | 9 / 10 | 9 / 10 | 6 / 10 | 3 / 10 |
+| Test cases matched (of 271) | 21 (8%) | 35 (13%) | 6 (2%) | 6 (2%) |
+| Repairs that returned the same code | 7 / 20 | 4 / 20 | 10 / 20 | 6 / 20 |
+| Avg LLM time per program | 461 s | 731 s | 141 s | 244 s |
+
+The examples did not make any program pass. For qwen, matched cases rose from 21 to
+35, mostly PAYROLL (3 → 10 of 28) and CURRENCY (no longer a compile error, 7 of 33),
+while INVENTORY went from compiling to not compiling. The same mistakes the
+examples address still appear in the diffs, e.g. `COMMAS 0` for `00` and `[]` for a
+10-character field. For `tiny-h`, fewer programs compiled (6 → 3) and
+three ended on floating point. Each figure is one sample per program, so
+differences of a few cases are within run-to-run noise.
 
 **Fitting on 8 GB.** `granite4:micro` (2.1 GB) and `granite4:tiny-h` (4.4 GB) ran 100%
 on the GPU. `qwen2.5-coder:7b` (5.4 GB loaded) ran 85% GPU / 15% CPU, which is why it
@@ -186,9 +210,9 @@ scripts/doctor.sh   toolchain check
 
 ## Roadmap
 
-- **Next:** larger models where the hardware allows, few-shot examples of COBOL
-  edited-picture formatting in the prompt, and a repair loop that targets the first
-  differing line.
+- **Next:** larger models where the hardware allows, several samples per program to
+  separate real effects from noise, and a repair loop that targets the first differing
+  line. (Formatting examples in the prompt: tried, see Results.)
 - **Phase 3:** file-based I/O programs, copybooks, and a write-up of where models fail.
 
 ## License

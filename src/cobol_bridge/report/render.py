@@ -32,6 +32,7 @@ class RunSummary:
     compiled: int
     cases_passed: int
     cases_total: int
+    cases_generated: int | None  # every generated case, compiled or not; None if unknown
     avg_attempts: float
     repairs: int
     repeated_repairs: int | None  # None when neither the record nor artifacts can tell
@@ -80,8 +81,32 @@ def _repeated(r: Record, artifacts: Path | None) -> int | None:
     return sum(a == b for a, b in itertools.pairwise(code))
 
 
-def summarise(run_id: str, records: list[Record], artifacts: Path | None = None) -> RunSummary:
+def _case_key(r: Record) -> tuple[str, str]:
+    return (str(r["program"]), str(r.get("inputs_sha256", "")))
+
+
+def generated_cases(records: Iterable[Record]) -> dict[tuple[str, str], int]:
+    """Cases per (program, inputs), learnt from any run whose Java compiled.
+
+    A record only counts its cases when its final attempt compiled, so a fixed
+    denominator for comparing runs is taken from other runs on the same inputs.
+    """
+    known: dict[tuple[str, str], int] = {}
+    for r in records:
+        key = _case_key(r)
+        known[key] = max(known.get(key, 0), int(r["tests_total"]))
+    return known
+
+
+def summarise(
+    run_id: str,
+    records: list[Record],
+    artifacts: Path | None = None,
+    generated: dict[tuple[str, str], int] | None = None,
+) -> RunSummary:
     n = len(records)
+    gen = generated if generated is not None else generated_cases(records)
+    per_program = [gen.get(_case_key(r), 0) for r in records]
     repeated = [_repeated(r, artifacts) for r in records]
     attempts = [a for r in records for a in r["attempt_log"]]
     return RunSummary(
@@ -95,6 +120,7 @@ def summarise(run_id: str, records: list[Record], artifacts: Path | None = None)
         compiled=sum(bool(r["compile_ok"]) for r in records),
         cases_passed=sum(r["tests_passed"] for r in records),
         cases_total=sum(r["tests_total"] for r in records),
+        cases_generated=None if 0 in per_program else sum(per_program),
         avg_attempts=sum(r["attempts"] for r in records) / n,
         repairs=sum(max(r["attempts"] - 1, 0) for r in records),
         repeated_repairs=None if None in repeated else sum(x or 0 for x in repeated),
@@ -123,7 +149,9 @@ def select_runs(
             if rid > latest.get(key, ""):
                 latest[key] = rid
         chosen = list(latest.values())
-    runs = [summarise(rid, by_run[rid], artifacts) for rid in chosen]
+    every = [r for recs in by_run.values() for r in recs]
+    generated = generated_cases(every)
+    runs = [summarise(rid, by_run[rid], artifacts, generated) for rid in chosen]
     return sorted(runs, key=lambda s: (-s.passed, -s.cases_passed, s.model, s.config))
 
 
@@ -142,6 +170,10 @@ def metric_rows(runs: list[RunSummary]) -> list[tuple[str, list[str]]]:
         (
             "Test cases passed (compiled programs)",
             [f"{s.cases_passed}/{s.cases_total}" for s in runs],
+        ),
+        (
+            "Test cases passed (all generated)",
+            [_pct(s.cases_passed, s.cases_generated) if s.cases_generated else "n/a" for s in runs],
         ),
         ("Avg attempts", [f"{s.avg_attempts:.2f}" for s in runs]),
         ("Repairs repeating previous code", [_pct(s.repeated_repairs, s.repairs) for s in runs]),

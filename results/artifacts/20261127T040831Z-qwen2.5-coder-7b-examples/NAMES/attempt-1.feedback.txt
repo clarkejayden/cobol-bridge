@@ -1,0 +1,10 @@
+The Java program does not compile. javac reported:
+```
+Main.java:71: error: cannot find symbol
+        wsUserid = wsUserid.toLowerCase();
+                           ^
+  symbol:   method toLowerCase()
+  location: variable wsUserid of type StringBuilder
+1 error
+```
+Fix every error and return the complete corrected program in one ```java block.
