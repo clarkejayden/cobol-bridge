@@ -53,6 +53,54 @@ Rules for the Java program:
 7. STOP RUN ends the program normally with exit code 0. Do not print anything extra.
 """
 
+# (PIC, COBOL literal moved into the field, exact GnuCOBOL DISPLAY output).
+# tests/test_prompts.py compiles these with cobc and checks every output, so the
+# examples given to the model are the oracle's own behaviour, not hand-written.
+FORMAT_EXAMPLES: tuple[tuple[str, str, str], ...] = (
+    ("9(2)", "0", "00"),
+    ("9(4)", "12", "0012"),
+    ("9(5)V99", "36.5", "00036.50"),
+    ("S9(4)V99", "-3.2", "-0003.20"),
+    ("S9(3)", "7", "+007"),
+    ("X(8)", '"AB"', "AB      "),
+    ("X(5)", "SPACES", "     "),
+    ("ZZ9", "0", "  0"),
+    ("Z,ZZ9", "1234", "1,234"),
+    ("Z,ZZ9", "5", "    5"),
+    ("ZZ,ZZ9.99", "0", "     0.00"),
+    ("ZZ,ZZ9.99", "36796.64", "36,796.64"),
+    ("-Z,ZZ9", "-42", "-   42"),
+    ("-Z,ZZ9", "42", "    42"),
+    ("+ZZ,ZZ9", "42", "+    42"),
+    ("+ZZ,ZZ9", "-1500", "- 1,500"),
+    ("ZZ9.99CR", "-3.5", "  3.50CR"),
+)
+
+
+def format_examples() -> str:
+    """Worked DISPLAY examples, added to the translation rules by the "examples" variant."""
+    width = max(len(pic) for pic, _, _ in FORMAT_EXAMPLES)
+    lines = [
+        "8. Worked DISPLAY examples from GnuCOBOL (brackets mark the exact width; every field",
+        "   is printed at its full width, so leading zeros and padding spaces are never dropped):",
+    ]
+    for pic, value, shown in FORMAT_EXAMPLES:
+        lines.append(f"     PIC {pic:<{width}}  value {value:<9} -> [{shown}]")
+    lines += [
+        "   java.text.DecimalFormat and String.valueOf do not produce these: build each field's",
+        "   text yourself (digits with zero fill, then the PIC's editing), and keep its width.",
+    ]
+    return "\n".join(lines) + "\n"
+
+
+PROMPT_VARIANTS = ("base", "examples")
+
+
+def translation_rules(variant: str = "base") -> str:
+    if variant not in PROMPT_VARIANTS:
+        raise ValueError(f"unknown prompt variant {variant!r}")
+    return TRANSLATION_RULES + (format_examples() if variant == "examples" else "")
+
 
 def describe_record(record_name: str, fields: list[Field]) -> str:
     """A table of the input record's fields, offsets and types for the prompt."""
@@ -80,12 +128,12 @@ def explain(source: str) -> str:
     )
 
 
-def translate(source: str, explanation: str, record: str) -> str:
+def translate(source: str, explanation: str, record: str, variant: str = "base") -> str:
     return (
         "Translate this COBOL program into Java 21.\n\n"
         f"```cobol\n{source}\n```\n\n"
         f"What the program does:\n{explanation.strip()}\n\n"
-        f"{record}\n\n{TRANSLATION_RULES}"
+        f"{record}\n\n{translation_rules(variant)}"
     )
 
 

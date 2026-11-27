@@ -1,9 +1,10 @@
 """Turn JSONL run records into comparison tables (Markdown and static HTML).
 
 A *run* is every record sharing a ``run_id``: one model, one configuration,
-the whole corpus. By default the latest run for each (model, repair strategy)
-pair is reported, so a re-run replaces older numbers but the Phase 1
-``replay`` baseline and the ``fresh`` repair strategy are shown side by side.
+the whole corpus. By default the latest run for each (model, repair strategy,
+prompt variant) is reported, so a re-run replaces older numbers but different
+configurations (the Phase 1 ``replay`` baseline, the ``examples`` prompt) are
+shown side by side.
 """
 
 from __future__ import annotations
@@ -24,6 +25,7 @@ class RunSummary:
     run_id: str
     model: str
     repair_strategy: str
+    prompt_variant: str
     programs: int
     passed_first_try: int
     passed: int
@@ -40,11 +42,20 @@ class RunSummary:
 
     @property
     def label(self) -> str:
-        return f"{self.model} ({self.repair_strategy} repair)"
+        return f"{self.model} ({self.config})"
+
+    @property
+    def config(self) -> str:
+        extra = "" if self.prompt_variant == "base" else f", {self.prompt_variant} prompt"
+        return f"{self.repair_strategy} repair{extra}"
 
 
 def _strategy(r: Record) -> str:
     return str(r.get("repair_strategy", "replay"))
+
+
+def _variant(r: Record) -> str:
+    return str(r.get("prompt_variant", "base"))
 
 
 def _squash(text: str) -> str:
@@ -77,6 +88,7 @@ def summarise(run_id: str, records: list[Record], artifacts: Path | None = None)
         run_id=run_id,
         model=records[0]["model"],
         repair_strategy=_strategy(records[0]),
+        prompt_variant=_variant(records[0]),
         programs=n,
         passed_first_try=sum(bool(r["passed_first_try"]) for r in records),
         passed=sum(bool(r["passed"]) for r in records),
@@ -98,21 +110,21 @@ def select_runs(
     run_ids: list[str] | None = None,
     artifacts: Path | None = None,
 ) -> list[RunSummary]:
-    """Group by run; keep the given runs, or the latest run per (model, strategy)."""
+    """Group by run; keep the given runs, or the latest run per model and configuration."""
     by_run: dict[str, list[Record]] = defaultdict(list)
     for r in records:
         by_run[r["run_id"]].append(r)
     if run_ids:
         chosen = [rid for rid in run_ids if rid in by_run]
     else:
-        latest: dict[tuple[str, str], str] = {}
+        latest: dict[tuple[str, str, str], str] = {}
         for rid, recs in by_run.items():
-            key = (recs[0]["model"], _strategy(recs[0]))
+            key = (recs[0]["model"], _strategy(recs[0]), _variant(recs[0]))
             if rid > latest.get(key, ""):
                 latest[key] = rid
         chosen = list(latest.values())
     runs = [summarise(rid, by_run[rid], artifacts) for rid in chosen]
-    return sorted(runs, key=lambda s: (-s.passed, -s.cases_passed, s.model, s.repair_strategy))
+    return sorted(runs, key=lambda s: (-s.passed, -s.cases_passed, s.model, s.config))
 
 
 def _pct(k: int | None, n: int) -> str:
@@ -184,12 +196,13 @@ def _md_table(header: list[str], rows: list[tuple[str, list[str]]]) -> str:
 
 
 def render_markdown(runs: list[RunSummary]) -> str:
-    header = ["", *[f"`{s.model}`<br>{s.repair_strategy} repair" for s in runs]]
+    header = ["", *[f"`{s.model}`<br>{s.config}" for s in runs]]
     parts = [
         "# cobol-bridge results",
         "",
-        "Latest run per model and repair strategy. A program passes only if the Java output "
-        "matches GnuCOBOL byte for byte on every generated input.",
+        "Latest run per model and configuration (repair strategy, prompt variant). "
+        "A program passes only if the Java output matches GnuCOBOL byte for byte on every "
+        "generated input.",
         "",
         "## Summary",
         "",
@@ -250,10 +263,7 @@ def _html_table(header: list[str], rows: list[tuple[str, list[str]]], color: boo
 def render_html(runs: list[RunSummary]) -> str:
     header = [
         "",
-        *[
-            f"<code>{html.escape(s.model)}</code><br>{html.escape(s.repair_strategy)} repair"
-            for s in runs
-        ],
+        *[f"<code>{html.escape(s.model)}</code><br>{html.escape(s.config)}" for s in runs],
     ]
     runs_list = "".join(
         f"<li><code>{html.escape(s.run_id)}</code>: {html.escape(s.label)}</li>" for s in runs
@@ -264,7 +274,8 @@ def render_html(runs: list[RunSummary]) -> str:
 <title>cobol-bridge results</title><style>{_CSS}</style></head>
 <body>
 <h1>cobol-bridge results</h1>
-<p>Latest run per model and repair strategy. A program passes only if the Java output matches
+<p>Latest run per model and configuration (repair strategy, prompt variant).
+A program passes only if the Java output matches
 GnuCOBOL byte for byte on every generated input.</p>
 <h2>Summary</h2>
 {_html_table(header, metric_rows(runs))}

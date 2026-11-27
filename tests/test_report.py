@@ -57,6 +57,19 @@ def test_latest_run_per_model_and_strategy() -> None:
     assert runs[0].model == "m1"  # best pass rate first
 
 
+def test_prompt_variants_reported_separately() -> None:
+    records = [
+        rec("20260101-a", "m1", "P1"),  # older records have no prompt_variant: base
+        rec("20260102-a", "m1", "P1", prompt_variant="examples"),
+    ]
+    runs = select_runs(records)
+    assert {(s.prompt_variant, s.run_id) for s in runs} == {
+        ("base", "20260101-a"),
+        ("examples", "20260102-a"),
+    }
+    assert {s.config for s in runs} == {"fresh repair", "fresh repair, examples prompt"}
+
+
 def test_metrics() -> None:
     records = [
         rec("r", "m", "A", **PASS),

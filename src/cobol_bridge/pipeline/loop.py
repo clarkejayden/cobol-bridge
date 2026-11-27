@@ -41,6 +41,8 @@ class PipelineConfig:
     #              own turn, then the feedback, at the first attempt's settings.
     repair_strategy: str = "fresh"
     repair_temperature: float = 0.4
+    # "base": the translation rules only; "examples": plus worked DISPLAY examples.
+    prompt_variant: str = "base"
 
     def attempt_params(self, attempt: int) -> GenerationParams:
         """Sampling settings for one attempt (repairs differ only under "fresh")."""
@@ -83,6 +85,7 @@ class RunRecord:
     input_seed: int
     repair_strategy: str = "replay"
     repair_temperature: float = 0.0
+    prompt_variant: str = "base"
     attempts: int = 0
     passed: bool = False
     passed_first_try: bool = False
@@ -180,6 +183,7 @@ def translate_program(
         repair_temperature=(
             cfg.repair_temperature if cfg.repair_strategy == "fresh" else p.temperature
         ),
+        prompt_variant=cfg.prompt_variant,
         source_sha256=_sha(source.encode()),
     )
     art = _Artifacts(cfg.artifacts_dir / program if cfg.artifacts_dir else None)
@@ -205,7 +209,12 @@ def translate_program(
 
     request = Message(
         "user",
-        prompts.translate(source, explanation, prompts.describe_record(record_name, fields)),
+        prompts.translate(
+            source,
+            explanation,
+            prompts.describe_record(record_name, fields),
+            cfg.prompt_variant,
+        ),
     )
     messages = [system, request]
     previous: str | None = None

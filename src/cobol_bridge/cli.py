@@ -12,6 +12,7 @@ import typer
 
 from cobol_bridge.llm.base import GenerationParams, LLMError
 from cobol_bridge.llm.ollama import OllamaProvider
+from cobol_bridge.llm.prompts import PROMPT_VARIANTS
 from cobol_bridge.pipeline.loop import PipelineConfig, RunRecord, translate_program
 from cobol_bridge.report.render import render_html, render_markdown, select_runs
 from cobol_bridge.report.store import append_record, read_records
@@ -42,15 +43,22 @@ RepairOpt = Annotated[
     ),
 ]
 RepairTempOpt = Annotated[float, typer.Option(help="Temperature for repair attempts (fresh).")]
+VariantOpt = Annotated[
+    str,
+    typer.Option(
+        help="base: translation rules only; examples: plus worked DISPLAY formatting examples."
+    ),
+]
 
 
 def _echo(msg: str) -> None:
     typer.echo(msg, err=True)
 
 
-def _run_id(model: str) -> str:
+def _run_id(model: str, variant: str = "base") -> str:
     stamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    return f"{stamp}-{re.sub(r'[^A-Za-z0-9.]+', '-', model)}"
+    suffix = "" if variant == "base" else f"-{variant}"
+    return f"{stamp}-{re.sub(r'[^A-Za-z0-9.]+', '-', model)}{suffix}"
 
 
 def _git_commit() -> str:
@@ -92,11 +100,16 @@ def _config(
     artifacts: Path,
     repair_strategy: str,
     repair_temperature: float,
+    prompt_variant: str,
 ) -> PipelineConfig:
     if repair_strategy not in ("fresh", "replay"):
         _echo("error: --repair-strategy must be 'fresh' or 'replay'")
         raise typer.Exit(2)
+    if prompt_variant not in PROMPT_VARIANTS:
+        _echo(f"error: --prompt-variant must be one of {', '.join(PROMPT_VARIANTS)}")
+        raise typer.Exit(2)
     return PipelineConfig(
+        prompt_variant=prompt_variant,
         repair_strategy=repair_strategy,
         repair_temperature=repair_temperature,
         max_attempts=attempts,
@@ -126,11 +139,12 @@ def translate(
     n_random: RandomOpt = 20,
     repair_strategy: RepairOpt = "fresh",
     repair_temperature: RepairTempOpt = 0.4,
+    prompt_variant: VariantOpt = "base",
     results: ResultsOpt = DEFAULT_RESULTS,
 ) -> None:
     """Explain, translate, verify and repair one COBOL program."""
     provider, tc, versions = _setup(model)
-    run_id = _run_id(model)
+    run_id = _run_id(model, prompt_variant)
     artifacts = results.parent / "artifacts" / run_id
     cfg = _config(
         max_attempts,
@@ -142,6 +156,7 @@ def translate(
         artifacts,
         repair_strategy,
         repair_temperature,
+        prompt_variant,
     )
     rec = translate_program(program, provider, tc, cfg, run_id=run_id, log=_echo)
     _save(rec, results, versions, _git_commit())
@@ -166,6 +181,7 @@ def evaluate(
     n_random: RandomOpt = 20,
     repair_strategy: RepairOpt = "fresh",
     repair_temperature: RepairTempOpt = 0.4,
+    prompt_variant: VariantOpt = "base",
     results: ResultsOpt = DEFAULT_RESULTS,
 ) -> None:
     """Run the full loop on every .cbl program in a directory."""
@@ -174,7 +190,7 @@ def evaluate(
         _echo(f"error: no .cbl files in {corpus_dir}")
         raise typer.Exit(2)
     provider, tc, versions = _setup(model)
-    run_id = _run_id(model)
+    run_id = _run_id(model, prompt_variant)
     commit = _git_commit()
     cfg = _config(
         max_attempts,
@@ -186,6 +202,7 @@ def evaluate(
         results.parent / "artifacts" / run_id,
         repair_strategy,
         repair_temperature,
+        prompt_variant,
     )
     _echo(f"run {run_id}: {len(programs)} programs, model {model}")
     records: list[dict[str, Any]] = []
@@ -211,7 +228,7 @@ def report(
         Path | None, typer.Option(help="Where report.md and report.html go (default: results/).")
     ] = None,
 ) -> None:
-    """Write Markdown and HTML comparison tables (latest run per model and repair strategy)."""
+    """Write Markdown and HTML comparison tables (latest run per model and configuration)."""
     records = list(read_records(results))
     if not records:
         _echo(f"no results in {results}")

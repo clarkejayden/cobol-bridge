@@ -48,6 +48,14 @@ def test_correct_translation_passes_first_try(toolchain: Toolchain, tmp_path: Pa
     assert (tmp_path / "SALESTAX" / "explanation.md").read_text() == "It computes sales tax."
 
 
+def test_prompt_variant_reaches_prompt_and_record(toolchain: Toolchain, tmp_path: Path) -> None:
+    provider = FakeProvider(["It computes sales tax.", java("correct")])
+    cfg = PipelineConfig(artifacts_dir=tmp_path, prompt_variant="examples")
+    rec = translate_program(PROGRAM, provider, toolchain, cfg, run_id="test")
+    assert rec.passed and rec.prompt_variant == "examples"
+    assert "Worked DISPLAY examples" in provider.calls[1][-1].content
+
+
 def test_repairs_compile_error_then_wrong_output(toolchain: Toolchain, tmp_path: Path) -> None:
     rec, provider = run(
         [java("compile_error"), java("wrong_output"), java("correct")], toolchain, tmp_path
