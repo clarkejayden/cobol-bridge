@@ -46,7 +46,7 @@ RepairTempOpt = Annotated[float, typer.Option(help="Temperature for repair attem
 VariantOpt = Annotated[
     str,
     typer.Option(
-        help="base: translation rules only; examples: plus worked DISPLAY formatting examples."
+        help="base: rules only; examples: + worked DISPLAY examples; helpers: + the Pic class."
     ),
 ]
 

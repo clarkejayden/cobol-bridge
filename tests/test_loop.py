@@ -56,6 +56,21 @@ def test_prompt_variant_reaches_prompt_and_record(toolchain: Toolchain, tmp_path
     assert "Worked DISPLAY examples" in provider.calls[1][-1].content
 
 
+def test_helpers_variant_compiles_pic_with_translation(
+    toolchain: Toolchain, tmp_path: Path
+) -> None:
+    provider = FakeProvider(["It computes sales tax.", java("pic")])
+    cfg = PipelineConfig(artifacts_dir=tmp_path, prompt_variant="helpers")
+    rec = translate_program(PROGRAM, provider, toolchain, cfg, run_id="test")
+    assert rec.passed and rec.passed_first_try, rec.attempt_log
+    assert "class `Pic` is compiled together" in provider.calls[1][-1].content
+
+
+def test_pic_translation_fails_without_helper(toolchain: Toolchain, tmp_path: Path) -> None:
+    rec, _ = run([java("pic")], toolchain, tmp_path, attempts=1)
+    assert rec.final_stage == "compile"  # Pic is only provided by the helpers variant
+
+
 def test_repairs_compile_error_then_wrong_output(toolchain: Toolchain, tmp_path: Path) -> None:
     rec, provider = run(
         [java("compile_error"), java("wrong_output"), java("correct")], toolchain, tmp_path

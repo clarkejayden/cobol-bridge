@@ -41,7 +41,8 @@ class PipelineConfig:
     #              own turn, then the feedback, at the first attempt's settings.
     repair_strategy: str = "fresh"
     repair_temperature: float = 0.4
-    # "base": the translation rules only; "examples": plus worked DISPLAY examples.
+    # "base": the translation rules only; "examples": plus worked DISPLAY examples;
+    # "helpers": plus the Pic helper class, compiled with the translation.
     prompt_variant: str = "base"
 
     def attempt_params(self, attempt: int) -> GenerationParams:
@@ -218,12 +219,13 @@ def translate_program(
     )
     messages = [system, request]
     previous: str | None = None
+    support = prompts.support_files(cfg.prompt_variant)
     for attempt in range(1, cfg.max_attempts + 1):
         params = cfg.attempt_params(attempt)
         resp = ask(messages, params)
         java = prompts.extract_java(resp.text)
         art.write(f"attempt-{attempt}.java", java or resp.text)
-        vr = verify_java(java, baseline, tc)
+        vr = verify_java(java, baseline, tc, support)
         repeated = attempt > 1 and _same_code(java, previous)
         rec.repeated_repairs += repeated
         _record_attempt(rec, attempt, vr, resp, params, repeated)

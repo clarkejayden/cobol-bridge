@@ -10,6 +10,7 @@ from __future__ import annotations
 import re
 
 from cobol_bridge.inputs.picparse import Field
+from cobol_bridge.runtime import pic_java
 
 SYSTEM = (
     "You are a senior mainframe modernisation engineer. You translate COBOL programs "
@@ -93,13 +94,43 @@ def format_examples() -> str:
     return "\n".join(lines) + "\n"
 
 
-PROMPT_VARIANTS = ("base", "examples")
+HELPER_RULES = """\
+8. A helper class `Pic` is compiled together with your program (do not write or import
+   it, and do not define your own class named Pic). It implements COBOL data
+   representation exactly as GnuCOBOL does. Pass each field's PICTURE string exactly as
+   written in the COBOL source:
+     BigDecimal Pic.num(String text, String pic)  value of a numeric input field's text
+         Pic.num(line.substring(10, 18), "9(6)V99")        "00123456" -> 1234.56
+         Pic.num(line.substring(0, 6), "S9(3)V99")         "-01234"   -> -12.34
+     BigDecimal Pic.fit(BigDecimal v, String pic)                    MOVE / COMPUTE into a field
+     BigDecimal Pic.fit(BigDecimal v, String pic, boolean rounded)   (true for ROUNDED)
+         truncates or rounds decimals, drops high-order digits, drops the sign if no S
+     boolean Pic.overflows(BigDecimal v, String pic, boolean rounded)  ON SIZE ERROR test
+     String Pic.show(BigDecimal v, String pic)   exact DISPLAY text of a numeric field
+     String Pic.show(long v, String pic)         (also for counters and subscripts)
+         Pic.show(new BigDecimal("5"), "9(3)") -> "005"
+         Pic.show(new BigDecimal("0"), "ZZ,ZZ9.99") -> "     0.00"
+     String Pic.show(String s, String pic)       alphanumeric field: Pic.show("AB", "X(5)")
+         -> "AB   " (padded or cut to the field's width)
+   Use Pic.num for every numeric input field, Pic.fit every time a value is stored into a
+   numeric field, and Pic.show for every field you DISPLAY. Do not format numbers yourself.
+"""
+
+PROMPT_VARIANTS = ("base", "examples", "helpers")
 
 
 def translation_rules(variant: str = "base") -> str:
     if variant not in PROMPT_VARIANTS:
         raise ValueError(f"unknown prompt variant {variant!r}")
-    return TRANSLATION_RULES + (format_examples() if variant == "examples" else "")
+    extra = {"base": "", "examples": format_examples(), "helpers": HELPER_RULES}[variant]
+    return TRANSLATION_RULES + extra
+
+
+def support_files(variant: str) -> dict[str, str]:
+    """Java sources compiled alongside the translation for this prompt variant."""
+    if variant == "helpers":
+        return {"Pic.java": pic_java()}
+    return {}
 
 
 def describe_record(record_name: str, fields: list[Field]) -> str:

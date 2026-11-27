@@ -51,9 +51,12 @@ def compile_cobol(ws: Workspace, tc: Toolchain, source: str, name: str = "prog")
     return CompileOutcome(res, program)
 
 
-def compile_java(ws: Workspace, tc: Toolchain, source: str) -> CompileOutcome:
-    """Compile a single-file ``Main.java`` with ``javac --release 21``."""
-    ws.write({f"{JAVA_CLASS}.java": source})
+def compile_java(
+    ws: Workspace, tc: Toolchain, source: str, support: dict[str, str] | None = None
+) -> CompileOutcome:
+    """Compile ``Main.java`` (plus any support files, e.g. ``Pic.java``) with javac 21."""
+    extra = dict(support or {})
+    ws.write({f"{JAVA_CLASS}.java": source, **extra})
     res = ws.run(
         [
             str(tc.javac),
@@ -64,6 +67,7 @@ def compile_java(ws: Workspace, tc: Toolchain, source: str) -> CompileOutcome:
             "-d",
             "classes",
             f"{JAVA_CLASS}.java",
+            *sorted(extra),
         ],
         timeout_s=COMPILE_TIMEOUT_S,
         cpu_limit_s=600,

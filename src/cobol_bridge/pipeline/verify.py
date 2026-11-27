@@ -101,15 +101,24 @@ def _trim(text: str, max_lines: int) -> str:
     return "\n".join(lines)
 
 
-def verify_java(java: str | None, baseline: Baseline, tc: Toolchain) -> VerifyResult:
-    """Static-check, compile and run a translation against the COBOL baseline."""
+def verify_java(
+    java: str | None,
+    baseline: Baseline,
+    tc: Toolchain,
+    support: dict[str, str] | None = None,
+) -> VerifyResult:
+    """Static-check, compile and run a translation against the COBOL baseline.
+
+    ``support`` files (e.g. the ``Pic`` helper) are compiled alongside but not
+    static-checked: only the model's own code is.
+    """
     if java is None:
         return VerifyResult(Stage.NO_CODE)
     violations = floating_point_violations(java)
     if violations:
         return VerifyResult(Stage.STATIC, static_violations=violations)
     with workspace(tc.search_path()) as ws:
-        outcome = compile_java(ws, tc, java)
+        outcome = compile_java(ws, tc, java, support)
         if outcome.program is None:
             return VerifyResult(
                 Stage.COMPILE, compile_errors=_trim(outcome.diagnostics, MAX_COMPILE_ERROR_LINES)
