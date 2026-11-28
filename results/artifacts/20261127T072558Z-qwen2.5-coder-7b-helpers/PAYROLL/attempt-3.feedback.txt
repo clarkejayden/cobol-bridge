@@ -1,0 +1,15 @@
+The Java program does not compile. javac reported:
+```
+Main.java:48: error: cannot find symbol
+        if ("C".equals(inStatus)) {
+                       ^
+  symbol:   variable inStatus
+  location: class Main
+Main.java:56: error: cannot find symbol
+        if ("C".equals(inStatus)) {
+                       ^
+  symbol:   variable inStatus
+  location: class Main
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

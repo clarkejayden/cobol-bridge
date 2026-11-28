@@ -1,0 +1,10 @@
+The Java program does not compile. javac reported:
+```
+Main.java:8: error: cannot find symbol
+        String line = new BufferedReader(new InputStreamReader(System.in)).readLine();
+                                             ^
+  symbol:   class InputStreamReader
+  location: class Main
+1 error
+```
+Fix every error and return the complete corrected program in one ```java block.

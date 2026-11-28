@@ -1,0 +1,13 @@
+The Java program compiled but its output differs from COBOL on 26 of 33 test inputs. For this input record:
+```
+000000000      
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1 +1 @@
+-UNSUPPORTED PAIR    /
++UNSUPPORTED PAIR /
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.

@@ -215,6 +215,8 @@ def evaluate(
         _save(rec, results, versions, commit)
         records.append(rec.to_json())
     typer.echo(summary_table(records))
+    if provider.retries:
+        typer.echo(f"\nOllama requests retried after a transient error: {provider.retries}")
     typer.echo(f"\nrun id: {run_id}  results: {results}")
 
 

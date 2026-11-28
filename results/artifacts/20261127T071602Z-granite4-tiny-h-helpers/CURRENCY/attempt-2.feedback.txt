@@ -1,0 +1,6 @@
+The Java program uses floating point, which cannot represent COBOL decimals exactly:
+- line 56: floating-point literal: return BigDecimal.valueOf(1.0000);
+- line 58: floating-point literal: return BigDecimal.valueOf(0.9150);
+- line 60: floating-point literal: return BigDecimal.valueOf(0.7820);
+- line 62: floating-point literal: return BigDecimal.valueOf(151.2400);
+Use java.math.BigDecimal with explicit scale and RoundingMode instead, and return the complete corrected program in one ```java block.

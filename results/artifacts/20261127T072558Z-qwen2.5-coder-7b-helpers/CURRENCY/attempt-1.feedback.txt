@@ -1,0 +1,15 @@
+The Java program does not compile. javac reported:
+```
+Main.java:25: error: cannot find symbol
+        wsFromRate = wsRate;
+                     ^
+  symbol:   variable wsRate
+  location: class Main
+Main.java:29: error: cannot find symbol
+        wsToRate = wsRate;
+                   ^
+  symbol:   variable wsRate
+  location: class Main
+2 errors
+```
+Fix every error and return the complete corrected program in one ```java block.

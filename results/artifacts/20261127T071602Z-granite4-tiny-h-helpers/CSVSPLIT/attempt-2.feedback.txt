@@ -1,0 +1,21 @@
+The Java program compiled but its output differs from COBOL on 18 of 18 test inputs. For this input record:
+```
+                                        
+```
+the difference is (lines starting '-' are the COBOL output, '+' are yours):
+```diff
+--- expected (COBOL)
++++ actual (Java)
+@@ -1,5 +1,5 @@
+-COMMAS 00 FIELDS 01
+-FIELD 1 LEN 40 [          ]
+-FIELD 2 LEN 00 [          ]
+-FIELD 3 LEN 00 [          ]
+-FIELD 4 LEN 00 [          ]
++COMMAS 0 FIELDS 4
++FIELD 1 LEN 10 [          ]
++FIELD 2 LEN 10 [          ]
++FIELD 3 LEN 10 [          ]
++FIELD 4 LEN 10 [          ]
+```
+Find the cause, fix it, and return the complete corrected program in one ```java block.
